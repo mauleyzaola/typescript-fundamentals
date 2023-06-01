@@ -1,4 +1,4 @@
-import { getProducts, Product } from '../lib';
+import { getProducts, IProduct } from '../lib';
 
 export default async function updateOutput(id: string) {
   const products = await getProducts();
@@ -10,7 +10,7 @@ export default async function updateOutput(id: string) {
   }
 }
 
-function layoutProducts(products: Product[]) {
+function layoutProducts(products: IProduct[]) {
   const items = products.map((product) => {
     const { id, name, icon } = product;
     const productHtml = `
@@ -18,7 +18,7 @@ function layoutProducts(products: Product[]) {
       <i class="card-icon ${icon} fa-lg"></i>
     <span class="card-name">${name}</span>
     `;
-    const cardHtml = `
+    return `
     <li>
         <div class="card">
             <div class="card-content">
@@ -29,8 +29,6 @@ function layoutProducts(products: Product[]) {
         </div>
     </li>
     `;
-    return cardHtml;
   });
-  let productsHtml = `<ul>${items.join('')}</ul>`;
-  return productsHtml;
+  return `<ul>${items.join('')}</ul>`;
 }
