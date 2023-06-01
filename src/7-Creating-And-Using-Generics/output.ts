@@ -1,4 +1,4 @@
-import { productsURL, FoodProduct, customersURL } from '../lib';
+import { customersURL, FoodProduct, productsURL } from '../lib';
 
 const prefix = '🐉 ';
 
@@ -8,6 +8,7 @@ interface HasId {
 
 class GenericModel<T extends HasId> {
   public items: T[] | undefined;
+
   constructor(public url: string) {}
 
   async getItems(): Promise<T[]> {
@@ -16,7 +17,7 @@ class GenericModel<T extends HasId> {
   }
 
   getItemById(id: number): T | undefined {
-    return this.items ? this.items.find((p) => (id === p.id)) : undefined;
+    return this.items ? this.items.find((p) => id === p.id) : undefined;
   }
 }
 
@@ -42,7 +43,7 @@ function layoutProducts(products: FoodProduct[]): string {
       <i class="card-icon ${icon} fa-lg"></i>
     <span class="card-name">${name}</span>
     `;
-    const cardHtml = `
+    return `
     <li>
         <div class="card">
             <div class="card-content">
@@ -53,22 +54,18 @@ function layoutProducts(products: FoodProduct[]): string {
         </div>
     </li>
     `;
-    return cardHtml;
   });
-  let productsHtml = `<ul>${items.join('')}</ul>`;
-  return productsHtml;
+  return `<ul>${items.join('')}</ul>`;
 }
 
 async function getProducts(): Promise<FoodProduct[]> {
   const response: Response = await fetch(productsURL);
-  const products: FoodProduct[] = await response.json();
-  return products;
+  return await response.json();
 }
 
 async function getList<T>(url: string): Promise<T[]> {
   const response: Response = await fetch(url);
-  const items: T[] = await response.json();
-  return items;
+  return await response.json();
 }
 
 /************************************************
@@ -83,19 +80,21 @@ async function runTheLearningSamples() {
     return arg;
   }
 
-  console.log(`${prefix} Generics Overview`);
-  console.log(whatIsIt_number(11));
+  // console.log(`${prefix} Generics Overview`);
+  // console.log(whatIsIt_number(11));
 
   function whatIsIt_string(arg: string): string {
     return arg;
   }
-  console.log(whatIsIt_string('john'));
+
+  // console.log(whatIsIt_string('john'));
 
   function whatIsIt_any(arg: any): any {
     return arg;
   }
-  console.log(whatIsIt_any(11));
-  console.log(whatIsIt_any('john'));
+
+  // console.log(whatIsIt_any(11));
+  // console.log(whatIsIt_any('john'));
 
   function whatIsIt_typed<T>(arg: T): T {
     return arg;
@@ -104,7 +103,7 @@ async function runTheLearningSamples() {
   let n: number = whatIsIt_typed<number>(11);
   let s: string = whatIsIt_typed<string>('john');
   let b: boolean = whatIsIt_typed<boolean>(true);
-  console.log(n, s, b);
+  // console.log(n, s, b);
 
   // generics on functions
 
@@ -117,14 +116,15 @@ async function runTheLearningSamples() {
   }
 
   async function getData() {
-    console.log(`${prefix} Generic Functions`);
+    // console.log(`${prefix} Generic Functions`);
 
     const products = await getList<FoodProduct>(productsURL);
-    console.table(products);
+    // console.table(products);
 
     const customers = await getList<Customer>(customersURL);
-    console.table(customers);
+    // console.table(customers);
   }
+
   await getData();
 
   // generic interface
@@ -144,14 +144,14 @@ async function runTheLearningSamples() {
     }
 
     getItemById(id: number): FoodProduct | undefined {
-      return this.items ? this.items.find((item) => (id === item.id)) : undefined;
+      return this.items ? this.items.find((item) => id === item.id) : undefined;
     }
   }
 
   const foodModel: FoodModel = new FoodModel();
   await foodModel.getItems();
-  console.log(`${prefix} Generic Interface`);
-  console.table(foodModel.items);
+  // console.log(`${prefix} Generic Interface`);
+  // console.table(foodModel.items);
 
   // generic classes
 
@@ -161,9 +161,9 @@ async function runTheLearningSamples() {
   const genericCustomerModel = new GenericModel<Customer>(customersURL);
   await genericFoodModel.getItems();
   await genericCustomerModel.getItems();
-  console.log(`${prefix} Generic Class`);
-  console.table(genericFoodModel.items);
-  console.table(genericCustomerModel.items);
+  // console.log(`${prefix} Generic Class`);
+  // console.table(genericFoodModel.items);
+  // console.table(genericCustomerModel.items);
 
   // generic constraints
 
@@ -185,3 +185,49 @@ async function runTheLearningSamples() {
   // const pearFood: FoodProduct = pear;
   const pearFood: Partial<FoodProduct> = pear;
 }
+
+// function that takes a generic argument
+function displayMe<T>(param: T): T {
+  return param;
+}
+
+// console.log(displayMe<string>('Hello'));
+// console.log(displayMe<boolean>(true));
+
+interface Customer {
+  id: number;
+  name: string;
+}
+
+async function getData() {
+  const products = await getList<FoodProduct>(productsURL);
+  const customers = await getList<Customer>(customersURL);
+  // console.table(products);
+  // console.table(customers);
+}
+
+(async function () {
+  await getData();
+})();
+
+interface Model<T> {
+  items: T[] | undefined;
+  getItems: () => Promise<T[]>;
+  getItemById: (id: number) => T | undefined;
+}
+
+class FoodModel implements Model<FoodProduct> {
+  getItemById(id: number): FoodProduct | undefined {
+    return this.items ? this.items?.find((x) => x.id === id) : undefined;
+  }
+
+  async getItems(): Promise<FoodProduct[]> {
+    this.items = await getList<FoodProduct>(productsURL);
+    return this.items;
+  }
+
+  items: FoodProduct[] | undefined;
+}
+
+const foodModel2 = new FoodModel();
+foodModel2.getItems().then(() => console.table(foodModel2.items));
