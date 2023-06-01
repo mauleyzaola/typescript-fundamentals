@@ -1,5 +1,4 @@
-import { getProducts, IProduct } from '../lib';
-import { FoodProduct } from '../lib/product';
+import { FoodProduct, getProducts, IProduct } from '../lib';
 
 class ProductOutput {
   products: IProduct[] = [];
@@ -37,7 +36,7 @@ class ProductOutput {
         <span class="button is-pulled-right" id="${id}">Edit</button>
       `;
 
-      const cardHtml = `
+      return `
         <li>
             <div class="card" id="${id}">
                 <div class="card-content">
@@ -48,11 +47,9 @@ class ProductOutput {
             </div>
         </li>
       `;
-      return cardHtml;
     });
 
-    let productsHtml = `<ul>${items.join('')}</ul>`;
-    return productsHtml;
+    return `<ul>${items.join('')}</ul>`;
   }
 
   private getProduct(id: number) {
