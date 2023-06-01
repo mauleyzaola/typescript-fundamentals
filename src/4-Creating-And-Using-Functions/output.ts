@@ -90,11 +90,11 @@ export default async function updateOutput(id: string) {
 }
 
 function layoutProducts(products: ProductType[]) {
-  const items = products.map((p: ProductType) => {
+  const items = products.map(({ id, icon, name }: ProductType) => {
     const productHtml = `
-    <span class="card-id">#${p.id}</span>
-        <i class="card-icon ${p.icon} fa-lg"></i>
-    <span class="card-name">#${p.name}</span>
+    <span class="card-id">#${id}</span>
+        <i class="card-icon ${icon} fa-lg"></i>
+    <span class="card-name">#${name}</span>
     `;
     return `
     <li>
@@ -111,7 +111,10 @@ function layoutProducts(products: ProductType[]) {
   return `<ul>${items.join('')}</ul>`;
 }
 
-const getRandomInt = (max: number = 100000) => Math.floor(Math.random() * max);
+const getRandomInt = (max: number = 100000) => {
+  const { floor, random } = Math;
+  return floor(random() * max);
+};
 
 function createProduct(
   name: string,
@@ -130,6 +133,7 @@ let mango = createProduct('Mango');
 
 // console.log(`${JSON.stringify([pineApple, mango], null, 2)}`);
 console.table([pineApple, mango]);
+
 // rest parameter example
 function buildAddress(
   street: string,
@@ -148,3 +152,10 @@ let address = buildAddress(
 );
 
 console.log(address);
+
+// destructuring parameters
+function displayProduct({ id, name }: ProductType): void {
+  console.log(`id: ${id} name: ${name}`);
+}
+
+displayProduct(createProduct('Mauricio'));
